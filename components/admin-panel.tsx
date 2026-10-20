@@ -177,6 +177,22 @@ export default function AdminPanel({ open, onClose }: Props) {
     }
   }
 
+  async function resetStats() {
+    if (!window.confirm("Удалить всю статистику, счётчики и журнал событий? Уникальные ссылки и настройки сохранятся.")) return;
+    setBusy(true);
+    setError("");
+    setNotice("");
+    try {
+      await requestJson<{ ok: boolean }>("/api/admin/stats", { method: "DELETE" });
+      setNotice("Статистика полностью обнулена");
+      await loadAll();
+    } catch (resetError) {
+      setError(resetError instanceof Error ? resetError.message : "Не удалось обнулить статистику");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   function trackingUrl(slug: string) {
     return `${window.location.origin}/?ref=${encodeURIComponent(slug)}`;
   }
@@ -210,7 +226,10 @@ export default function AdminPanel({ open, onClose }: Props) {
           <div className="admin-content">
             <div className="admin-status-row">
               <div>{notice && <span className="form-success">{notice}</span>}{error && <span className="form-error">{error}</span>}</div>
-              <label className="period-select">Период<select value={period} onChange={(event) => changePeriod(event.target.value)}><option value="7">7 дней</option><option value="30">30 дней</option><option value="90">90 дней</option><option value="all">Всё время</option></select></label>
+              <div className="stats-controls">
+                <button className="danger-button" type="button" disabled={busy} onClick={resetStats}>Обнулить статистику</button>
+                <label className="period-select">Период<select value={period} onChange={(event) => changePeriod(event.target.value)}><option value="7">7 дней</option><option value="30">30 дней</option><option value="90">90 дней</option><option value="all">Всё время</option></select></label>
+              </div>
             </div>
 
             <section className="metric-grid" aria-label="Сводка">

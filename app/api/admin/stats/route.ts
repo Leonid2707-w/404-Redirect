@@ -72,3 +72,11 @@ export async function GET(request: Request) {
     recent: recent.results || [],
   });
 }
+
+export async function DELETE(request: Request) {
+  const denied = await requireAdmin(request);
+  if (denied) return denied;
+
+  await getDatabase().prepare("DELETE FROM events").run();
+  return json({ ok: true });
+}

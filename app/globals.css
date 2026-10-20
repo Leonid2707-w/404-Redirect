@@ -56,6 +56,7 @@ button{cursor:pointer}
 .admin-primary:disabled{opacity:.55;cursor:wait}
 .form-error{margin:0;color:#ff8a99}.form-success{color:#74dfa7}
 .admin-status-row{min-height:40px;display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:16px}
+.stats-controls{display:flex;align-items:center;gap:10px}.danger-button{border:1px solid rgba(255,105,125,.35);border-radius:9px;background:rgba(120,24,42,.22);color:#ff8ea0;padding:9px 12px;font-weight:700}.danger-button:disabled{opacity:.55;cursor:wait}
 .period-select{display:flex!important;grid-template-columns:auto 130px!important;align-items:center;gap:10px!important}.period-select select{padding:7px 10px}
 .metric-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-bottom:18px}
 .metric-grid article{min-width:0;padding:15px;border:1px solid rgba(255,255,255,.09);border-radius:14px;background:linear-gradient(145deg,#17101f,#120c19)}
