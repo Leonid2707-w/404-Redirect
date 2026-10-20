@@ -153,6 +153,20 @@ export default function AdminPanel({ open, onClose }: Props) {
     }
   }
 
+  async function testTelegram() {
+    setBusy(true);
+    setError("");
+    setNotice("");
+    try {
+      await requestJson<{ ok: boolean }>("/api/admin/telegram-test", { method: "POST" });
+      setNotice("Тестовое сообщение отправлено в Telegram");
+    } catch (testError) {
+      setError(testError instanceof Error ? testError.message : "Не удалось проверить Telegram");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function changePeriod(value: string) {
     setPeriod(value);
     setBusy(true);
@@ -230,7 +244,10 @@ export default function AdminPanel({ open, onClose }: Props) {
                   <label>Telegram-канал<input type="url" value={settings.channel_url} onChange={(e) => setSettings({ ...settings, channel_url: e.target.value })} placeholder="Пусто — скрыть ссылку" /></label>
                   <label className="switch-row"><input type="checkbox" checked={settings.telegram_enabled !== "false"} onChange={(e) => setSettings({ ...settings, telegram_enabled: e.target.checked ? "true" : "false" })} /><span>Отправлять клики в Telegram</span></label>
                   <p className={`integration-state ${telegram.tokenConfigured && telegram.chatConfigured ? "ready" : ""}`}>{telegram.tokenConfigured && telegram.chatConfigured ? "Бот и канал настроены на сервере" : "Нужно добавить токен бота и ID канала в защищённые переменные сервера"}</p>
-                  <button className="admin-primary" disabled={busy}>Сохранить</button>
+                  <div className="settings-actions">
+                    <button className="admin-primary" disabled={busy}>Сохранить</button>
+                    <button className="admin-secondary" type="button" disabled={busy} onClick={testTelegram}>Проверить Telegram</button>
+                  </div>
                 </form>
               </section>
             </div>

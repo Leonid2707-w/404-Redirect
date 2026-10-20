@@ -67,6 +67,7 @@ button{cursor:pointer}
 .card-heading h3{margin:2px 0 0;font-size:17px}.card-heading>span{color:#8e839a;font-size:12px}
 .link-form{display:grid;grid-template-columns:1fr 1fr;gap:12px}.link-form .full{grid-column:1/-1}
 .settings-form{display:grid;gap:12px}
+.settings-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.admin-secondary{border:1px solid rgba(255,255,255,.16);border-radius:10px;background:#191120;color:#f3eaff;font-weight:700;padding:12px 15px}.admin-secondary:disabled{opacity:.55;cursor:wait}
 .switch-row{display:flex!important;align-items:center;gap:9px!important;cursor:pointer}.switch-row input{width:17px;height:17px;accent-color:#8a3bcb}.switch-row span{font-size:13px}
 .integration-state{margin:0;padding:10px 12px;border-radius:9px;background:#251724;color:#e7a6ae;font-size:12px}.integration-state.ready{background:#10231b;color:#79d8a7}
 .table-scroll{overflow-x:auto}
