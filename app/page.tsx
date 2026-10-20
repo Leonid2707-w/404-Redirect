@@ -38,7 +38,7 @@ export default function Home() {
 
   useEffect(() => {
     void fetch("/api/config", { cache: "no-store" })
-      .then((response) => (response.ok ? response.json() : null))
+      .then(async (response) => (response.ok ? (await response.json()) as { links?: typeof initialLinks } : null))
       .then((data) => data?.links && setLinks(data.links))
       .catch(() => undefined);
     sendEvent("page_view");

@@ -1,6 +1,6 @@
-import { env } from "cloudflare:workers";
+import { getPostgresDatabase } from "@/lib/server-db";
 
-type RuntimeEnv = Cloudflare.Env & {
+type RuntimeEnv = {
   ADMIN_LOGIN?: string;
   ADMIN_PASSWORD?: string;
   SESSION_SECRET?: string;
@@ -8,11 +8,16 @@ type RuntimeEnv = Cloudflare.Env & {
   TELEGRAM_CHAT_ID?: string;
 };
 
-export const runtimeEnv = env as RuntimeEnv;
+export const runtimeEnv: RuntimeEnv = {
+  ADMIN_LOGIN: process.env.ADMIN_LOGIN,
+  ADMIN_PASSWORD: process.env.ADMIN_PASSWORD,
+  SESSION_SECRET: process.env.SESSION_SECRET,
+  TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN,
+  TELEGRAM_CHAT_ID: process.env.TELEGRAM_CHAT_ID,
+};
 
 export function getDatabase() {
-  if (!runtimeEnv.DB) throw new Error("Database is not configured");
-  return runtimeEnv.DB;
+  return getPostgresDatabase();
 }
 
 export function json(data: unknown, status = 200, headers?: HeadersInit) {
@@ -166,7 +171,10 @@ export function cleanUrl(value: unknown) {
 
 export function getCountry(request: Request) {
   const cf = (request as Request & { cf?: { country?: string } }).cf;
-  return cleanText(cf?.country || request.headers.get("cf-ipcountry") || "—", 8);
+  return cleanText(
+    cf?.country || request.headers.get("x-vercel-ip-country") || request.headers.get("cf-ipcountry") || "—",
+    8,
+  );
 }
 
 export async function getSettings() {

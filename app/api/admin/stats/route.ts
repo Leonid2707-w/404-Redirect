@@ -1,4 +1,5 @@
 import { getDatabase, json, requireAdmin } from "@/lib/site-server";
+import type { DatabasePreparedStatement } from "@/lib/server-db";
 
 export const dynamic = "force-dynamic";
 
@@ -56,7 +57,7 @@ export async function GET(request: Request) {
     ORDER BY e.id DESC LIMIT 40
   `);
 
-  const bind = <T extends D1PreparedStatement>(statement: T) => (cutoff ? statement.bind(cutoff) : statement);
+  const bind = (statement: DatabasePreparedStatement) => (cutoff ? statement.bind(cutoff) : statement);
   const [totals, links, timeline, recent] = await db.batch([
     bind(totalsStatement),
     bind(linksStatement),

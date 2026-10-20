@@ -7,15 +7,16 @@ type LinkItem = { id: number; slug: string; label: string; source: string; accou
 type StatLink = LinkItem & { views: number; visitors: number; clicks: number; unique_clicks: number; partner_clicks: number; chat_clicks: number; channel_clicks: number };
 type Stats = { totals: Record<string, number>; links: StatLink[]; timeline: Array<{ day: string; views: number; clicks: number }>; recent: Array<Record<string, string | number | null>> };
 type Settings = { partner_url: string; chat_url: string; channel_url: string; telegram_enabled: string };
+type TelegramState = { tokenConfigured: boolean; chatConfigured: boolean };
 
 const emptyStats: Stats = { totals: {}, links: [], timeline: [], recent: [] };
 const emptySettings: Settings = { partner_url: "", chat_url: "", channel_url: "", telegram_enabled: "true" };
 
-async function requestJson(url: string, init?: RequestInit) {
+async function requestJson<T>(url: string, init?: RequestInit): Promise<T> {
   const response = await fetch(url, { cache: "no-store", credentials: "same-origin", ...init });
-  const data = await response.json().catch(() => ({}));
+  const data = await response.json().catch(() => ({})) as T & { error?: string };
   if (!response.ok) throw new Error(data.error || "Ошибка запроса");
-  return data;
+  return data as T;
 }
 
 function n(value: unknown) {
@@ -36,9 +37,9 @@ export default function AdminPanel({ open, onClose }: Props) {
 
   const loadAll = useCallback(async (days = period) => {
     const [linksData, statsData, settingsData] = await Promise.all([
-      requestJson("/api/admin/links"),
-      requestJson(`/api/admin/stats?days=${days}`),
-      requestJson("/api/admin/settings"),
+      requestJson<{ links: LinkItem[] }>("/api/admin/links"),
+      requestJson<Stats>(`/api/admin/stats?days=${days}`),
+      requestJson<{ settings: Settings; telegram: TelegramState }>("/api/admin/settings"),
     ]);
     setLinks(linksData.links || []);
     setStats(statsData);
@@ -50,7 +51,7 @@ export default function AdminPanel({ open, onClose }: Props) {
     if (!open) return;
     setChecking(true);
     setError("");
-    void requestJson("/api/admin/session")
+    void requestJson<{ authenticated: boolean }>("/api/admin/session")
       .then(async (data) => {
         setAuthenticated(Boolean(data.authenticated));
         if (data.authenticated) await loadAll();
@@ -101,7 +102,7 @@ export default function AdminPanel({ open, onClose }: Props) {
     const form = event.currentTarget;
     const values = Object.fromEntries(new FormData(form));
     try {
-      const result = await requestJson("/api/admin/links", {
+      const result = await requestJson<{ ok: boolean; slug: string }>("/api/admin/links", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(values),
@@ -156,7 +157,7 @@ export default function AdminPanel({ open, onClose }: Props) {
     setPeriod(value);
     setBusy(true);
     try {
-      setStats(await requestJson(`/api/admin/stats?days=${value}`));
+      setStats(await requestJson<Stats>(`/api/admin/stats?days=${value}`));
     } finally {
       setBusy(false);
     }
